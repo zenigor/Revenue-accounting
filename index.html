@@ -1,0 +1,2858 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Учет доходов" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="apple-touch-icon" href="wallet_black_192x192.png" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Приложение для учета доходов</title>
+    <!-- UIkit CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/css/uikit.min.css"
+    />
+    <!-- CSS -->
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic);
+      * {
+        -webkit-tap-highlight-color: transparent !important;
+        font-family: 'RobotoDraft' !important;
+        -webkit-font-smoothing: subpixel-antialiased !important;
+        backface-visibility: hidden !important;
+        -webkit-backface-visibility: hidden !important;
+        -moz-backface-visibility: hidden !important;
+        -ms-backface-visibility: hidden !important;
+      }
+      button,
+      input {
+        border-radius: 100px !important;
+      }
+      input {
+        padding: 15px !important;
+      }
+      .uk-modal-header {
+        padding: 30px 30px 0 30px;
+        border-bottom: none;
+        border-top-left-radius: 40px; /* Скругление верхнего левого угла */
+        border-top-right-radius: 40px; /* Скругление верхнего правого угла */
+      }
+      .uk-modal-dialog {
+        border-radius: 40px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .uk-modal {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px); /* Для Safari */
+      }
+      .base-price-btn {
+        margin-top: 5px;
+      }
+      .custom-price-button {
+        margin-right: 4px;
+      }
+      #extras-container button,
+      #month-buttons-container button {
+        margin-right: 4px;
+        margin-top: 5px;
+      }
+      .uk-margin-xsmall-right {
+        margin-right: 10px;
+      }
+      #icon-pause-counter {
+        cursor: pointer;
+      }
+      #icon-delete-counter {
+        cursor: pointer;
+      }
+      #loading-spinner {
+        z-index: 9999;
+        background-color: rgba(255, 255, 255, 1);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #add-income-modal .uk-button-default {
+        border-color: #e5e5e5 !important;
+        min-width: 102px;
+      }
+      #add-income-modal .uk-margin {
+        margin-top: 5px !important;
+        margin-bottom: 15px !important;
+      }
+      .calculated td {
+        /*				background-color: #ff0000 !important;*/
+        color: #666 !important;
+      }
+      td {
+        color: #1e87f0;
+        vertical-align: middle !important;
+      }
+      .uk-checkbox,
+      .uk-radio {
+        margin-top: auto !important;
+      }
+      .uk-countdown-red {
+        color: red !important;
+      }
+      /*.uk-tab >*> a{
+				font-size: .4rem;
+			}*/
+      .tab-container {
+        margin-bottom: 5px;
+        margin-top: 20px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        display: flex; /* Добавлено */
+      }
+
+      .tab-container ul.uk-tab {
+        flex-wrap: nowrap;
+        flex: 1; /* Добавлено */
+      }
+      /*             .uk-tab::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: -50px;
+    border-bottom: 1px solid #e5e5e5;
+} */
+      .tab-container ul.uk-tab > li {
+        display: inline-block;
+        white-space: normal;
+      }
+      .uk-tab > .has-income > a {
+        color: #1e87f0;
+      }
+      .show-table {
+        width: 155px;
+      }
+      * {
+        scrollbar-width: none; /* Для Firefox */
+        -ms-overflow-style: none; /* Для Internet Explorer и Edge */
+
+        /* Для Webkit-браузеров, таких как Safari и Chrome */
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+      .uk-checkbox:focus,
+      .uk-radio:focus {
+        outline: 0;
+        border-color: #ccc;
+      }
+      .uk-checkbox:checked:focus,
+      .uk-checkbox:indeterminate:focus,
+      .uk-radio:checked:focus {
+        background-color: #1e87f0;
+        border-color: #1e87f0;
+      }
+      button[uk-toggle*='target: #custom-price-modal'],
+      button[uk-toggle*='target: #custom-extra-modal'] {
+        min-width: auto !important;
+      }
+      #add-income-modal .uk-margin .uk-button-primary {
+        border-color: rgb(0 128 242) !important;
+        background: #1e87f0 !important;
+      }
+      input[type='date'],
+      input[type='datetime-local'] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: inherit;
+        text-align: center;
+        vertical-align: middle;
+        padding: 0.5em;
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      input[type='date']::-webkit-datetime-edit,
+      input[type='datetime-local']::-webkit-datetime-edit {
+        text-align: center;
+      }
+
+      input[type='date']::-webkit-inner-spin-button,
+      input[type='date']::-webkit-calendar-picker-indicator,
+      input[type='datetime-local']::-webkit-inner-spin-button,
+      input[type='datetime-local']::-webkit-calendar-picker-indicator {
+        opacity: 0.6;
+        margin-top: 2px;
+      }
+
+      @media (max-width: 1000px) {
+        #income-table-body td {
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+        }
+        .uk-tab > li:not(.uk-active, .has-income) > a:hover {
+          color: #999;
+          text-decoration: none;
+        }
+        .uk-tab > li > a {
+          touch-action: manipulation;
+        }
+        .show-table:hover,
+        #calculated-btn:hover,
+        #multi-trash-btn:hover {
+          border: 1px solid #e5e5e5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-spinner" class="uk-position-fixed uk-position-center">
+      <div uk-spinner></div>
+    </div>
+    <script src="md5.min.js"></script>
+    <script>
+      function setCookie(name, value, days) {
+        var expires = '';
+        if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+          expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + (value || '') + expires + '; path=/';
+      }
+
+      function getCookie(name) {
+        var nameEQ = name + '=';
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) == 0)
+            return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+      }
+
+      function generateSignature(value, askfdjakdjwfklsgags) {
+        return md5(value + askfdjakdjwfklsgags);
+      }
+
+      window.onload = function () {
+        var askfdjakdjwfklsgags = 'youraskfdjakdjwfklsgags';
+        var authCookie = getCookie('authenticated');
+        var signatureCookie = getCookie('signature');
+
+        if (
+          !authCookie ||
+          generateSignature(authCookie, askfdjakdjwfklsgags) !== signatureCookie
+        ) {
+          var password = prompt('Введите пароль для входа на сайт:');
+          var hashedPassword = md5(password);
+          var correctPasswordHash = '82c344e35a3d8027da502e493254f8ff';
+          if (hashedPassword !== correctPasswordHash) {
+            alert('Неверный пароль!');
+            window.location = 'about:blank';
+          } else {
+            // Устанавливаем cookie и его подпись на 7 дней, если пароль верный
+            var authenticatedValue = 'true';
+            setCookie('authenticated', authenticatedValue, 7);
+            var signature = generateSignature(
+              authenticatedValue,
+              askfdjakdjwfklsgags
+            );
+            setCookie('signature', signature, 7);
+          }
+        }
+
+        loadGirls()
+          .then(function (girlId) {
+            if (girlId) {
+              return loadGirlDetails(girlId);
+            }
+          })
+          .catch(function (error) {
+            console.error('Ошибка при загрузке данных:', error);
+          })
+          .finally(function () {
+            document.getElementById('loading-spinner').style.display = 'none';
+          });
+      };
+    </script>
+    <div class="uk-container uk-margin">
+      <h1 class="uk-margin-top">Учет доходов</h1>
+      <!-- Кнопка "Добавить девушку" -->
+      <button
+        class="uk-button uk-button-primary"
+        uk-toggle="target: #add-girl-modal"
+        id="main-table-toggle-btn"
+      >
+        Добавить девушку
+      </button>
+      <button
+        class="uk-button uk-button-secondary"
+        id="archive"
+        data-girl-id="${girlId}"
+      >
+        Архив
+      </button>
+      <!-- Табы для переключения между девушками -->
+      <div class="tab-container">
+        <ul class="uk-tab" id="girls-tab">
+          <!-- Динамически добавляемые табы -->
+        </ul>
+      </div>
+      <!-- Контейнер для отображения информации о девушке -->
+      <div id="girl-container">
+        <!-- Динамически добавляемый контент -->
+      </div>
+      <!-- Кнопка "Плюс" для добавления дохода -->
+      <button
+        class="uk-button uk-button-primary"
+        id="add-income-btn"
+        uk-toggle="target: #add-income-modal"
+      >
+        Плюс доход
+      </button>
+      <!-- Кнопка "Реклама ашу" для добавления счетчика рекламы  -->
+      <button
+        class="uk-button uk-button-secondary"
+        id="add-ashoo-counter-btn"
+        uk-toggle="target: #add-ashoo-counter"
+      >
+        Реклама ашу
+      </button>
+      <!-- Счетчик до окончания рекламы на ашу -->
+      <div
+        class="uk-grid-collapse uk-child-width-auto uk-margin"
+        id="ashoo-counter-box"
+        uk-grid
+        uk-countdown="date: {%isodate%}"
+      ></div>
+      <!-- Контейнер для отображения суммы заработка за сегодня -->
+      <div class="uk-text-bold uk-margin-top" id="today-income"></div>
+      <div class="uk-text-bold uk-margin-top" id="today-income-all"></div>
+      <!-- Таблица с доходами -->
+      <div class="uk-margin" id="table-button-wrapper">
+        <button
+          class="uk-button uk-button-default show-table"
+          type="button"
+          uk-toggle="target: #main-table"
+          onclick="toggleTableButtonText(this)"
+        >
+          Таблица
+        </button>
+        <button
+          id="calculated-btn"
+          class="uk-button uk-button-default"
+          type="button"
+          style="display: none"
+        >
+          <span uk-icon="icon: check"></span>
+        </button>
+        <button
+          id="multi-trash-btn"
+          class="uk-button uk-button-default"
+          type="button"
+          style="display: none"
+        >
+          <span uk-icon="icon: trash"></span>
+        </button>
+      </div>
+      <div class="uk-margin uk-overflow-auto" id="main-table" hidden>
+        <table class="uk-table uk-table-striped">
+          <thead>
+            <tr>
+              <th>Моё</th>
+              <th>Цена</th>
+              <th>Допы</th>
+              <th>Дата</th>
+              <th>Процент</th>
+              <th>Отметить</th>
+              <th>Редактировать</th>
+            </tr>
+          </thead>
+          <tbody id="income-table-body">
+            <!-- Динамически добавляемые строки таблицы -->
+          </tbody>
+        </table>
+        <br />
+        <button class="uk-button uk-button-secondary" id="download">
+          Скачать базу данных
+        </button>
+        <br /><br />
+        <a href="#" uk-totop></a>
+      </div>
+      <!-- Кнопки для расчета заработка за месяц и за все время -->
+      <p id="calculate_paragraph">Посчитать доход:</p>
+      <button
+        class="uk-button uk-button-primary"
+        uk-toggle="target: #calculate-month-modal"
+        id="calculate-month-btn"
+      >
+        За месяц
+      </button>
+      <button
+        class="uk-button uk-button-primary"
+        uk-toggle="target: #arbitrary_dates_modal"
+        id="calculate-all-btn"
+      >
+        За период
+      </button>
+    </div>
+    <!-- Модальное окно для добавления дохода -->
+    <div id="add-income-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Добавить доход</h2>
+        </div>
+        <div class="uk-modal-body">
+          <!-- <span>База:</span> -->
+          <div class="uk-margin">
+            <button
+              class="uk-button uk-button-default base-price-btn"
+              id="base-price-btn-1"
+            ></button>
+            <button
+              class="uk-button uk-button-default base-price-btn"
+              id="base-price-btn-2"
+            ></button>
+            <button
+              class="uk-button uk-button-default base-price-btn"
+              uk-toggle="target: #custom-price-modal"
+            >
+              +
+            </button>
+          </div>
+          <span>Допы:</span>
+          <div class="uk-margin" id="extras-container">
+            <!-- Динамически добавляемые кнопки для выбора допов -->
+            <button
+              class="uk-button uk-button-default"
+              uk-toggle="target: #custom-extra-modal"
+            >
+              +
+            </button>
+          </div>
+          <button
+            class="uk-button uk-button-primary"
+            id="add-income-submit-btn"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для ввода произвольной суммы -->
+    <div id="custom-price-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Произвольная база</h2>
+        </div>
+        <div class="uk-modal-body">
+          <input
+            class="uk-input"
+            type="number"
+            placeholder="Введите сумму"
+            id="custom-price-input"
+          />
+          <button
+            class="uk-button uk-button-primary uk-margin-top"
+            id="custom-price-submit-btn"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для добавления произвольного допа -->
+    <div id="custom-extra-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Произвольный доп</h2>
+        </div>
+        <div class="uk-modal-body">
+          <input
+            class="uk-input"
+            type="number"
+            placeholder="Введите доп"
+            id="custom-extra-input"
+          />
+          <button
+            class="uk-button uk-button-primary uk-margin-top"
+            id="custom-extra-submit-btn"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для добавления девушки -->
+    <div id="add-girl-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Добавить девушку</h2>
+        </div>
+        <div class="uk-modal-body">
+          <form id="add-girl-form">
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="text"
+                placeholder="Имя девушки"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Цена за час"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Процент"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="text"
+                placeholder="Допы (через запятую)"
+              />
+            </div>
+            <button class="uk-button uk-button-primary" type="submit">
+              Добавить
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="edit-girl-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Редактировать</h2>
+        </div>
+        <div class="uk-modal-body">
+          <form id="edit-girl-form">
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="text"
+                placeholder="Имя девушки"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Цена за час"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Процент"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="text"
+                placeholder="Допы (через запятую)"
+              />
+            </div>
+            <button class="uk-button uk-button-primary" type="submit">
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для добавления счетчика обратного отсчета рекламы на Ashoo -->
+    <div id="add-ashoo-counter" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Реклама ашу</h2>
+        </div>
+        <div class="uk-modal-body">
+          <form id="ahsoo-counter-form">
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                placeholder="Сумма пополнения в долларах"
+                value="57.351"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                placeholder="Цена рекламы в минуту"
+                value="0.0021"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Количество анкет"
+                value="2"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <!-- Добавление произвольной даты по желанию -->
+              <input class="uk-input" type="datetime-local" id="datetime" />
+            </div>
+            <button class="uk-button uk-button-primary" type="submit">
+              Добавить
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для расчетов за месяц -->
+    <div id="calculate-month-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Выберите месяц:</h2>
+        </div>
+        <div class="uk-modal-body">
+          <div id="month-buttons-container"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для расчетов между произвольными датами -->
+    <div id="arbitrary_dates_modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <!-- <button class="uk-modal-close-default" type="button" uk-close></button> -->
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Период:</h2>
+        </div>
+        <div class="uk-modal-body">
+          <input class="uk-input" type="date" value="" />
+          <br />
+          <input class="uk-input" type="date" value="" />
+          <br />
+          <button class="uk-button uk-button-primary" type="submit">
+            Рассчитать
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для редактирования дохода -->
+    <div id="edit-income-modal" uk-modal>
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <div class="uk-modal-header">
+          <h2 class="uk-modal-title">Редактировать</h2>
+        </div>
+        <div class="uk-modal-body">
+          <form id="edit-income-form">
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Моё"
+                id="edit-mine"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Цена"
+                id="edit-price"
+                required
+              />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="text"
+                placeholder="Допы"
+                id="edit-extras"
+              />
+            </div>
+            <div class="uk-margin">
+              <input class="uk-input" type="date" id="edit-date" />
+            </div>
+            <div class="uk-margin">
+              <input
+                class="uk-input"
+                type="number"
+                placeholder="Процент"
+                id="edit-percentage"
+                required
+              />
+            </div>
+            <button class="uk-button uk-button-primary" type="submit">
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/js/uikit-icons.min.js"></script>
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-functions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+      // Инициализация Firebase
+      var firebaseConfig = {
+        apiKey: 'AIzaSyC6iMNqCaAiqxuZ4UgXFPhpr1B1UZX0RnU',
+        authDomain: 'moneycheck-7bd94.firebaseapp.com',
+        projectId: 'moneycheck-7bd94',
+        storageBucket: 'moneycheck-7bd94.appspot.com',
+        messagingSenderId: '410734717529',
+        appId: '1:410734717529:web:87eb2a44e96bc350509f48',
+      };
+      firebase.initializeApp(firebaseConfig);
+      var db = firebase.firestore();
+
+      // Обработчик отправки формы добавления девушки
+      document
+        .getElementById('add-girl-form')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          var name = this.elements[0].value;
+          var price = parseInt(this.elements[1].value);
+          var percentage = parseInt(this.elements[2].value);
+          var extrasInput = this.elements[3].value.trim();
+          var extras = extrasInput
+            ? extrasInput.split(',').map(function (extra) {
+                return parseInt(extra.trim());
+              })
+            : [];
+          db.collection('girls')
+            .add({
+              name: name,
+              price: price,
+              percentage: percentage,
+              extras: extras,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+            .then(function (docRef) {
+              UIkit.modal('#add-girl-modal').hide();
+              var girlId = docRef.id;
+              selectedGirlId = girlId;
+              addIncomeListener(girlId);
+              // Очистка значений полей формы
+              document.getElementById('add-girl-form').reset();
+            })
+            .catch(function (error) {
+              console.error('Ошибка при добавлении девушки:', error);
+            });
+        });
+
+      // Переменная для хранения ID выбранной девушки
+      var selectedGirlId = null;
+
+      // Функция загрузки девушек из базы данных
+      function addIncomeListener(girlId) {
+        db.collection('girls')
+          .doc(girlId)
+          .collection('incomes')
+          .onSnapshot(function (snapshot) {
+            var hasUncalculatedIncome = false;
+            snapshot.forEach(function (doc) {
+              var income = doc.data();
+              if (
+                !income.hasOwnProperty('calculated') ||
+                income.calculated === false
+              ) {
+                hasUncalculatedIncome = true;
+              }
+            });
+            updateTabClass(girlId, hasUncalculatedIncome);
+          });
+      }
+
+      function updateTabClass(girlId, hasUncalculatedIncome) {
+        var tabLink = document.querySelector(
+          `#girls-tab a[data-girl-id="${girlId}"]`
+        );
+        if (tabLink) {
+          if (hasUncalculatedIncome) {
+            tabLink.parentElement.classList.add('has-income');
+          } else {
+            tabLink.parentElement.classList.remove('has-income');
+          }
+        }
+      }
+
+      // Глобальные переменные для хранения подписок на изменения
+      let girlsUnsubscribe = null;
+      let incomeUnsubscribe = null;
+
+      // Функция загрузки девушек из базы данных с использованием подписки
+      function loadGirls() {
+        return new Promise((resolve, reject) => {
+          if (girlsUnsubscribe) {
+            girlsUnsubscribe();
+          }
+
+          girlsUnsubscribe = db
+            .collection('girls')
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(
+              (snapshot) => {
+                const girlsTab = document.getElementById('girls-tab');
+                const newGirlsTab = document.createElement('ul');
+                newGirlsTab.className = 'uk-tab';
+                newGirlsTab.id = 'girls-tab';
+
+                snapshot.forEach((doc) => {
+                  const girl = doc.data();
+                  const a = document.createElement('a');
+                  a.href = '#';
+                  a.textContent = girl.name;
+                  a.setAttribute('data-girl-id', doc.id);
+                  a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    selectedGirlId = doc.id;
+                    loadGirlDetails(doc.id);
+                    setActiveTab(doc.id);
+                  });
+
+                  // Обработчик события 'touchstart' для мобильных устройств
+                  let isScrolling = false;
+
+                  a.addEventListener(
+                    'touchstart',
+                    function (e) {
+                      isScrolling = false;
+                    },
+                    {
+                      passive: true,
+                    }
+                  );
+
+                  a.addEventListener(
+                    'touchmove',
+                    function (e) {
+                      isScrolling = true;
+                    },
+                    {
+                      passive: true,
+                    }
+                  );
+
+                  a.addEventListener(
+                    'touchend',
+                    function (e) {
+                      if (!isScrolling) {
+                        e.preventDefault();
+                        selectedGirlId = doc.id;
+                        loadGirlDetails(doc.id);
+                        setActiveTab(doc.id);
+                      }
+                    },
+                    {
+                      passive: false,
+                    }
+                  );
+
+                  const li = document.createElement('li');
+                  li.appendChild(a);
+                  newGirlsTab.appendChild(li);
+
+                  addIncomeListener(doc.id);
+                });
+
+                girlsTab.parentNode.replaceChild(newGirlsTab, girlsTab);
+
+                if (selectedGirlId) {
+                  const selectedGirl = snapshot.docs.find(
+                    (doc) => doc.id === selectedGirlId
+                  );
+                  if (selectedGirl) {
+                    loadGirlDetails(selectedGirlId);
+                    setActiveTab(selectedGirlId);
+                    resolve(selectedGirlId);
+                  } else {
+                    selectedGirlId = snapshot.docs[0]?.id;
+                    if (selectedGirlId) {
+                      loadGirlDetails(selectedGirlId);
+                      setActiveTab(selectedGirlId);
+                      resolve(selectedGirlId);
+                    } else {
+                      resolve(null);
+                    }
+                  }
+                } else if (newGirlsTab.children.length > 0) {
+                  selectedGirlId = snapshot.docs[0].id;
+                  setActiveTab(selectedGirlId);
+                  resolve(selectedGirlId);
+                } else {
+                  resolve(null);
+                }
+              },
+              (error) => {
+                console.error('Ошибка при загрузке девушек:', error);
+                reject(error);
+              }
+            );
+        });
+      }
+
+      // Функция для установки активного таба
+      function setActiveTab(girlId) {
+        const girlsTab = document.getElementById('girls-tab');
+        const tabLinks = girlsTab.querySelectorAll('a');
+
+        tabLinks.forEach((link) => {
+          const li = link.parentNode;
+          if (link.getAttribute('data-girl-id') === girlId) {
+            li.classList.add('uk-active');
+          } else {
+            li.classList.remove('uk-active');
+          }
+        });
+      }
+
+      // Функция загрузки деталей девушки с использованием подписки
+      function loadGirlDetails(girlId) {
+        return new Promise((resolve, reject) => {
+          if (incomeUnsubscribe) {
+            incomeUnsubscribe();
+          }
+
+          db.collection('girls')
+            .doc(girlId)
+            .onSnapshot(
+              (doc) => {
+                if (doc.exists) {
+                  const girl = doc.data();
+                  const container = document.getElementById('girl-container');
+                  container.innerHTML = `
+										<div class="uk-flex uk-flex-middle">
+											<h2 class="uk-margin-remove-bottom">${girl.name}</h2>
+											<div class="uk-margin-left">
+												<button class="uk-button uk-button-primary" data-girl-id="${girlId}" onclick="editGirl(event)">
+													<span uk-icon="icon: pencil"></span>
+												</button>
+												<button class="uk-button uk-button-danger" data-girl-id="${girlId}" onclick="confirmDeleteGirl('${girlId}', '${
+                    girl.name
+                  }')">
+													<span uk-icon="icon: trash"></span>
+												</button>
+											</div>
+										</div>
+										<p>Цена за час: ${girl.price}</p>
+										<p>Процент: ${girl.percentage}%</p>
+										${girl.extras.length > 0 ? `<p>Допы: ${girl.extras.join(', ')}</p>` : ''}
+									`;
+
+                  // Установка данных для кнопок выбора базовой цены
+                  const basePrice1 = girl.price;
+                  const basePrice2 = basePrice1 * 2;
+                  document.getElementById('base-price-btn-1').textContent =
+                    basePrice1;
+                  document.getElementById('base-price-btn-2').textContent =
+                    basePrice2;
+
+                  // Установка данных для кнопок выбора допов
+                  const extrasContainer =
+                    document.getElementById('extras-container');
+                  const addExtraButton = extrasContainer.querySelector(
+                    '.uk-button-default[uk-toggle="target: #custom-extra-modal"]'
+                  );
+                  extrasContainer.innerHTML = ''; // Очищаем содержимое контейнера допов
+                  girl.extras.forEach((extra) => {
+                    const button = document.createElement('button');
+                    button.className = 'uk-button uk-button-default';
+                    button.textContent = extra;
+                    extrasContainer.appendChild(button); // Добавляем кнопки допов в контейнер
+                  });
+                  extrasContainer.appendChild(addExtraButton); // Добавляем кнопку "+" в контейнер допов
+
+                  // Подписываемся на изменения в коллекции "incomes" для данной девушки
+                  incomeUnsubscribe = db
+                    .collection('girls')
+                    .doc(girlId)
+                    .collection('incomes')
+                    .orderBy('date', 'desc')
+                    .onSnapshot(
+                      (snapshot) => {
+                        const tableBody =
+                          document.getElementById('income-table-body');
+                        const newTableBody = document.createElement('tbody');
+                        let todayIncome = 0;
+                        const today = new Date().toDateString();
+
+                        snapshot.forEach((doc) => {
+                          const income = doc.data();
+                          if (!isNaN(income.mine) && !isNaN(income.price)) {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+															<td>${income.mine}</td>
+															<td>${income.price}</td>
+															<td>${income.extras ? income.extras : '—'}</td>
+															<td>${new Date(income.date.toDate()).toLocaleDateString()}</td>
+															<td>${income.percentage}%</td>
+															<td><input type="checkbox" class="income-checkbox uk-checkbox" data-id="${
+                                doc.id
+                              }"></td>
+															<td><button class="uk-button uk-button-secondary edit-income-btn" data-id="${
+                                doc.id
+                              }"><span uk-icon="icon: file-edit" id="icon-delete-counter"></span></button></td>
+														`;
+                            if (income.calculated) {
+                              tr.classList.add('calculated');
+                            }
+                            newTableBody.appendChild(tr);
+                            if (
+                              new Date(income.date.toDate()).toDateString() ===
+                              today
+                            ) {
+                              todayIncome += income.mine;
+                            }
+                          }
+                        });
+
+                        tableBody.parentNode.replaceChild(
+                          newTableBody,
+                          tableBody
+                        );
+                        newTableBody.id = 'income-table-body';
+                        document.getElementById('today-income').textContent =
+                          'С девушки за сегодня: ' + todayIncome;
+
+                        // Загрузка общего заработка за сегодня со всех девушек
+                        db.collection('girls')
+                          .get()
+                          .then((snapshot) => {
+                            let totalTodayIncome = 0;
+                            const promises = [];
+                            snapshot.forEach((doc) => {
+                              updateButtonStates();
+                              const girlId = doc.id;
+                              const promise = db
+                                .collection('girls')
+                                .doc(girlId)
+                                .collection('incomes')
+                                .where('date', '>=', new Date(today))
+                                .where(
+                                  'date',
+                                  '<',
+                                  new Date(
+                                    new Date(today).getTime() +
+                                      24 * 60 * 60 * 1000
+                                  )
+                                )
+                                .get()
+                                .then((snapshot) => {
+                                  let girlTodayIncome = 0;
+                                  snapshot.forEach((doc) => {
+                                    const income = doc.data();
+                                    if (!isNaN(income.mine)) {
+                                      girlTodayIncome += income.mine;
+                                    }
+                                  });
+                                  totalTodayIncome += girlTodayIncome;
+                                });
+                              promises.push(promise);
+                            });
+                            Promise.all(promises).then(() => {
+                              document.getElementById(
+                                'today-income-all'
+                              ).textContent =
+                                'Со всех девушек за сегодня: ' +
+                                totalTodayIncome;
+                              // updateButtonStates(); // Обновление состояния кнопок после загрузки данных
+                              resolve();
+                            });
+                          });
+                      },
+                      (error) => {
+                        console.error(
+                          'Ошибка при загрузке доходов девушки:',
+                          error
+                        );
+                        reject(error);
+                      }
+                    );
+
+                  // Отображение счетчика рекламы на Ashoo
+                  displayAshooCounter(girl);
+                } else {
+                  // console.log("Данные девушки не найдены");
+                  resolve();
+                }
+              },
+              (error) => {
+                console.error('Ошибка при загрузке деталей девушки:', error);
+                reject(error);
+              }
+            );
+        });
+      }
+
+      // Добавим глобальную переменную для отслеживания текущего представления
+      let isArchiveView = false;
+
+      // Обновленный обработчик клика по кнопке архива
+      document.getElementById('archive').addEventListener('click', function () {
+        if (!isArchiveView) {
+          // Переход в архив
+          loadArchivedGirls();
+          this.textContent = 'Назад';
+          isArchiveView = true;
+        } else {
+          // Возврат к основному списку
+          loadMainGirls();
+          this.textContent = 'Архив';
+          isArchiveView = false;
+        }
+      });
+
+      // Функция загрузки основного списка девушек
+      function loadMainGirls() {
+        db.collection('girls')
+          .orderBy('createdAt', 'desc')
+          .get()
+          .then(function (snapshot) {
+            const girlsTab = document.getElementById('girls-tab');
+            const newGirlsTab = document.createElement('ul');
+            newGirlsTab.className = 'uk-tab';
+            newGirlsTab.id = 'girls-tab';
+
+            snapshot.forEach(function (doc) {
+              const girl = doc.data();
+              const a = document.createElement('a');
+              a.href = '#';
+              a.textContent = girl.name;
+              a.setAttribute('data-girl-id', doc.id);
+              a.addEventListener('click', function (e) {
+                e.preventDefault();
+                selectedGirlId = doc.id;
+                loadGirlDetails(doc.id);
+                setActiveTab(doc.id);
+              });
+
+              const li = document.createElement('li');
+              li.appendChild(a);
+              newGirlsTab.appendChild(li);
+
+              // Восстанавливаем слушатель доходов
+              addIncomeListener(doc.id);
+            });
+
+            girlsTab.parentNode.replaceChild(newGirlsTab, girlsTab);
+
+            // Показываем все элементы управления
+            document.getElementById('add-income-btn').style.display =
+              'inline-block';
+            document.getElementById('add-ashoo-counter-btn').style.display =
+              'inline-block';
+            document
+              .getElementById('ashoo-counter-box')
+              .style.removeProperty('display'); // Изменено
+            document.getElementById('today-income').style.display = 'block';
+            document.getElementById('today-income-all').style.display = 'block';
+            document.getElementById('calculate_paragraph').style.display =
+              'block';
+            document.getElementById('calculate-month-btn').style.display =
+              'inline-block';
+            document.getElementById('calculate-all-btn').style.display =
+              'inline-block';
+            document.getElementById('table-button-wrapper').style.display =
+              'block';
+
+            // Восстанавливаем заголовки таблицы
+            const incomeTableHeader = document.querySelector(
+              '#main-table thead tr'
+            );
+
+            incomeTableHeader.innerHTML = `
+							<th>Моё</th>
+							<th>Цена</th>
+							<th>Допы</th>
+							<th>Дата</th>
+							<th>Процент</th>
+							<th>Отметить</th>
+							<th>Редактировать</th>
+						`;
+
+            if (snapshot.size > 0) {
+              selectedGirlId = snapshot.docs[0].id;
+              loadGirlDetails(selectedGirlId);
+              setActiveTab(selectedGirlId);
+            }
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при загрузке основного списка девушек:',
+              error
+            );
+          });
+      }
+
+      // Обновленная функция загрузки архива
+      function loadArchivedGirls() {
+        db.collection('archive')
+          .orderBy('createdAt', 'desc')
+          .get()
+          .then(function (snapshot) {
+            const girlsTab = document.getElementById('girls-tab');
+            const newGirlsTab = document.createElement('ul');
+            newGirlsTab.className = 'uk-tab';
+            newGirlsTab.id = 'girls-tab';
+
+            snapshot.forEach(function (doc) {
+              const girl = doc.data();
+              const a = document.createElement('a');
+              a.href = '#';
+              a.textContent = girl.name;
+              a.setAttribute('data-girl-id', doc.id);
+              a.addEventListener('click', function (e) {
+                e.preventDefault();
+                selectedGirlId = doc.id;
+                loadArchivedGirlDetails(doc.id);
+                setActiveTab(doc.id);
+              });
+
+              const li = document.createElement('li');
+              li.appendChild(a);
+              newGirlsTab.appendChild(li);
+            });
+
+            girlsTab.parentNode.replaceChild(newGirlsTab, girlsTab);
+
+            // Скрываем элементы управления
+            document.getElementById('add-income-btn').style.display = 'none';
+            document.getElementById('add-ashoo-counter-btn').style.display =
+              'none';
+            document.getElementById('ashoo-counter-box').style.display = 'none';
+            document.getElementById('today-income').style.display = 'none';
+            document.getElementById('today-income-all').style.display = 'none';
+            document.getElementById('calculate_paragraph').style.display =
+              'none';
+            document.getElementById('calculate-month-btn').style.display =
+              'none';
+            document.getElementById('calculate-all-btn').style.display = 'none';
+            document.getElementById('table-button-wrapper').style.display =
+              'none';
+
+            // Обновляем заголовки таблицы для архивного представления
+            const incomeTableHeader = document.querySelector(
+              '#main-table thead tr'
+            );
+            incomeTableHeader.innerHTML = `
+                <th>Моё</th>
+                <th>Цена</th>
+                <th>Допы</th>
+                <th>Дата</th>
+                <th>Процент</th>
+            `;
+
+            if (snapshot.size > 0) {
+              selectedGirlId = snapshot.docs[0].id;
+              loadArchivedGirlDetails(selectedGirlId);
+              setActiveTab(selectedGirlId);
+            } else {
+              document.getElementById('girl-container').innerHTML =
+                'Архив пуст';
+              document.getElementById('income-table-body').innerHTML = '';
+            }
+          })
+          .catch(function (error) {
+            console.error('Ошибка при загрузке девушек из архива:', error);
+          });
+      }
+
+      function loadArchivedGirlDetails(girlId) {
+        db.collection('archive')
+          .doc(girlId)
+          .get()
+          .then(function (doc) {
+            if (doc.exists) {
+              const girl = doc.data();
+              const container = document.getElementById('girl-container');
+              container.innerHTML = `
+									<div class="uk-flex uk-flex-middle">
+										<h2 class="uk-margin-remove-bottom">${girl.name}</h2>
+										<div class="uk-margin-left">
+											<button class="uk-button uk-button-primary" data-girl-id="${girlId}" onclick="restoreGirl(event)">Вернуть</button>
+										</div>
+									</div>
+									<p>Цена за час: ${girl.price}</p>
+									<p>Процент: ${girl.percentage}%</p>
+									${girl.extras.length > 0 ? `<p>Допы: ${girl.extras.join(', ')}</p>` : ''}
+								`;
+
+              // Скрытие кнопок и счетчиков
+              document.getElementById('add-income-btn').style.display = 'none';
+              document.getElementById('add-ashoo-counter-btn').style.display =
+                'none';
+              document.getElementById('ashoo-counter-box').style.display =
+                'none';
+              document.getElementById('today-income').style.display = 'none';
+              document.getElementById('today-income-all').style.display =
+                'none';
+              document.getElementById('calculate_paragraph').style.display =
+                'none';
+
+              // Скрытие кнопок "Посчитать доход"
+              document.getElementById('calculate-month-btn').style.display =
+                'none';
+              document.getElementById('calculate-all-btn').style.display =
+                'none';
+
+              // Скрытие кнопок "Отметить" и "Редактировать" в таблице доходов
+              const incomeTableHeader = document.querySelector(
+                '#main-table thead tr'
+              );
+              incomeTableHeader.innerHTML = `
+								<th>Моё</th>
+								<th>Цена</th>
+								<th>Допы</th>
+								<th>Дата</th>
+								<th>Процент</th>
+							`;
+
+              loadArchivedIncomes(girlId);
+            } else {
+              console.log('Данные девушки не найдены в архиве');
+            }
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при загрузке деталей девушки из архива:',
+              error
+            );
+          });
+      }
+
+      function loadArchivedIncomes(girlId) {
+        db.collection('archive')
+          .doc(girlId)
+          .collection('incomes')
+          .orderBy('date', 'desc')
+          .get()
+          .then(function (snapshot) {
+            const tableBody = document.getElementById('income-table-body');
+            const newTableBody = document.createElement('tbody');
+            snapshot.forEach(function (doc) {
+              const income = doc.data();
+              if (!isNaN(income.mine) && !isNaN(income.price)) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+									<td>${income.mine}</td>
+									<td>${income.price}</td>
+									<td>${income.extras ? income.extras : '—'}</td>
+									<td>${new Date(income.date.toDate()).toLocaleDateString()}</td>
+									<td>${income.percentage}%</td>
+								`;
+                newTableBody.appendChild(tr);
+              }
+            });
+            tableBody.parentNode.replaceChild(newTableBody, tableBody);
+            newTableBody.id = 'income-table-body';
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при загрузке доходов девушки из архива:',
+              error
+            );
+          });
+      }
+
+      function restoreGirl(event) {
+        const target = event.target;
+        const girlId = target.dataset.girlId;
+
+        if (!girlId) {
+          console.error('Ошибка: ID девушки не найден.');
+          return;
+        }
+
+        const girlRef = db.collection('archive').doc(girlId);
+        const restoredGirlRef = db.collection('girls').doc(girlId);
+
+        girlRef
+          .get()
+          .then(function (doc) {
+            if (doc.exists) {
+              const girl = doc.data();
+              return restoredGirlRef.set(girl);
+            } else {
+              throw new Error('Девушка не найдена в архиве.');
+            }
+          })
+          .then(function () {
+            return girlRef.collection('incomes').get();
+          })
+          .then(function (snapshot) {
+            const batch = db.batch();
+            snapshot.forEach(function (doc) {
+              const incomeRef = girlRef.collection('incomes').doc(doc.id);
+              const restoredIncomeRef = restoredGirlRef
+                .collection('incomes')
+                .doc(doc.id);
+              batch.set(restoredIncomeRef, doc.data());
+              batch.delete(incomeRef);
+            });
+            return batch.commit();
+          })
+          .then(function () {
+            return girlRef.delete();
+          })
+          .then(function () {
+            console.log('Девушка успешно восстановлена из архива');
+            loadArchivedGirls();
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при восстановлении девушки из архива:',
+              error
+            );
+          });
+      }
+
+      function confirmDeleteGirl(girlId, girlName) {
+        var confirmName = prompt(
+          'Введите имя девушки для подтверждения удаления:'
+        );
+        if (
+          confirmName &&
+          confirmName.toLowerCase() === girlName.toLowerCase()
+        ) {
+          deleteGirl(girlId);
+        } else {
+          alert('Имя девушки не совпадает. Удаление отменено.');
+        }
+      }
+
+      function deleteGirl(girlId) {
+        var girlRef = db.collection('girls').doc(girlId);
+        var archiveRef = db.collection('archive').doc(girlId);
+
+        girlRef
+          .get()
+          .then(function (doc) {
+            var girl = doc.data();
+            return archiveRef.set(girl);
+          })
+          .then(function () {
+            return girlRef.collection('incomes').get();
+          })
+          .then(function (snapshot) {
+            var batch = db.batch();
+            snapshot.forEach(function (doc) {
+              var incomeRef = girlRef.collection('incomes').doc(doc.id);
+              var archiveIncomeRef = archiveRef
+                .collection('incomes')
+                .doc(doc.id);
+              batch.set(archiveIncomeRef, doc.data());
+              batch.delete(incomeRef);
+            });
+            return batch.commit();
+          })
+          .then(function () {
+            return girlRef.delete();
+          })
+          .then(function () {
+            console.log('Девушка и ее доходы успешно перемещены в архив');
+            var deletedGirlTab = document.querySelector(
+              `#girls-tab a[data-girl-id="${girlId}"]`
+            );
+            if (deletedGirlTab) {
+              var nextGirlTab = deletedGirlTab.parentElement.nextElementSibling;
+              var prevGirlTab =
+                deletedGirlTab.parentElement.previousElementSibling;
+              deletedGirlTab.parentElement.remove();
+              if (nextGirlTab) {
+                var nextGirlId = nextGirlTab
+                  .querySelector('a')
+                  .getAttribute('data-girl-id');
+                selectedGirlId = nextGirlId;
+                loadGirlDetails(nextGirlId);
+                setActiveTab(nextGirlId);
+              } else if (prevGirlTab) {
+                var prevGirlId = prevGirlTab
+                  .querySelector('a')
+                  .getAttribute('data-girl-id');
+                selectedGirlId = prevGirlId;
+                loadGirlDetails(prevGirlId);
+                setActiveTab(prevGirlId);
+              } else {
+                selectedGirlId = null;
+                document.getElementById('girl-container').innerHTML = '';
+                document.getElementById('income-table-body').innerHTML = '';
+                document.getElementById('today-income').textContent = '';
+                document.getElementById('today-income-all').textContent = '';
+                document.getElementById('ashoo-counter-box').innerHTML = '';
+              }
+            }
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при перемещении девушки и ее доходов в архив:',
+              error
+            );
+          });
+      }
+
+      // Обработчик отправки формы редактирования девушки
+      document
+        .getElementById('edit-girl-form')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          var form = this;
+          var girlId = form.dataset.girlId;
+          if (girlId) {
+            var name = form.elements[0].value;
+            var price = parseInt(form.elements[1].value);
+            var percentage = parseInt(form.elements[2].value);
+            var extrasInput = form.elements[3].value.trim();
+            var extras = extrasInput
+              ? extrasInput.split(',').map(function (extra) {
+                  return parseInt(extra.trim());
+                })
+              : [];
+            db.collection('girls')
+              .doc(girlId)
+              .update({
+                name: name,
+                price: price,
+                percentage: percentage,
+                extras: extras,
+              })
+              .then(function () {
+                console.log('Данные девушки успешно обновлены');
+                UIkit.modal('#edit-girl-modal').hide();
+                db.collection('girls')
+                  .doc(girlId)
+                  .get()
+                  .then(function (doc) {
+                    var girl = doc.data();
+                    var tabLink = document.querySelector(
+                      `#girls-tab a[data-girl-id="${girlId}"]`
+                    );
+                    if (tabLink) {
+                      tabLink.textContent = girl.name;
+                      loadGirlDetails(girlId);
+                    }
+                  })
+                  .catch(function (error) {
+                    console.error(
+                      'Ошибка при обновлении данных девушки:',
+                      error
+                    );
+                  });
+              })
+              .catch(function (error) {
+                console.error('Ошибка при обновлении данных девушки:', error);
+              });
+          }
+        });
+
+      async function editGirl(event) {
+        var target = event.target;
+        while (target && !target.hasAttribute('data-girl-id')) {
+          target = target.parentElement;
+        }
+        var girlId = target?.dataset?.girlId;
+
+        if (!girlId) {
+          console.error('Ошибка: ID девушки не найден.');
+          return;
+        }
+
+        try {
+          var doc = await db.collection('girls').doc(girlId).get();
+          if (!doc.exists) {
+            throw new Error('Девушка не найдена.');
+          }
+
+          var girl = doc.data();
+          var form = document.getElementById('edit-girl-form');
+
+          form.elements[0].value = girl.name || '';
+          form.elements[1].value = girl.price || '';
+          form.elements[2].value = girl.percentage || '';
+          form.elements[3].value = girl.extras?.join(', ') || '';
+          form.dataset.girlId = girlId;
+
+          UIkit.modal('#edit-girl-modal').show();
+        } catch (error) {
+          console.error('Ошибка при получении данных девушки:', error);
+          UIkit.modal('#edit-girl-modal').hide();
+        }
+      }
+
+      document.addEventListener('click', function (event) {
+        var target = event.target;
+        while (target && !target.classList.contains('edit-income-btn')) {
+          target = target.parentElement;
+        }
+        if (target && target.classList.contains('edit-income-btn')) {
+          var incomeId = target.dataset.id;
+          if (incomeId && selectedGirlId) {
+            loadIncomeDetails(selectedGirlId, incomeId);
+          }
+        }
+      });
+
+      async function loadIncomeDetails(girlId, incomeId) {
+        try {
+          var doc = await db
+            .collection('girls')
+            .doc(girlId)
+            .collection('incomes')
+            .doc(incomeId)
+            .get();
+          if (doc.exists) {
+            var income = doc.data();
+            document.getElementById('edit-mine').value = income.mine;
+            document.getElementById('edit-price').value = income.price;
+            document.getElementById('edit-extras').value = income.extras;
+            document.getElementById('edit-date').value = formatDate(
+              income.date.toDate()
+            );
+            document.getElementById('edit-percentage').value =
+              income.percentage;
+            document.getElementById('edit-income-form').dataset.incomeId =
+              incomeId;
+            UIkit.modal('#edit-income-modal').show();
+          } else {
+            console.warn('Доход не найден');
+          }
+        } catch (error) {
+          console.error('Ошибка при загрузке деталей дохода:', error);
+        }
+      }
+
+      document
+        .getElementById('edit-income-form')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          var form = this;
+          var incomeId = form.dataset.incomeId;
+          if (incomeId && selectedGirlId) {
+            var mine = parseInt(form.elements[0].value);
+            var price = parseInt(form.elements[1].value);
+            var extras = form.elements[2].value;
+            var date = new Date(form.elements[3].value);
+            var percentage = parseInt(form.elements[4].value);
+            db.collection('girls')
+              .doc(selectedGirlId)
+              .collection('incomes')
+              .doc(incomeId)
+              .update({
+                mine: mine,
+                price: price,
+                extras: extras,
+                date: date,
+                percentage: percentage,
+              })
+              .then(function () {
+                console.log('Доход успешно обновлен');
+                UIkit.modal('#edit-income-modal').hide();
+                loadIncomes(selectedGirlId);
+              })
+              .catch(function (error) {
+                console.error('Ошибка при обновлении дохода:', error);
+              });
+          }
+        });
+
+      // Функция загрузки доходов для девушки
+      function loadIncomes(girlId) {
+        return new Promise(function (resolve, reject) {
+          db.collection('girls')
+            .doc(girlId)
+            .collection('incomes')
+            .orderBy('date', 'desc')
+            .get()
+            .then(function (snapshot) {
+              var tableBody = document.getElementById('income-table-body');
+              var newTableBody = document.createElement('tbody');
+              var todayIncome = 0;
+              var today = new Date().toDateString();
+              snapshot.docs.forEach(function (doc) {
+                var income = doc.data();
+                if (!isNaN(income.mine) && !isNaN(income.price)) {
+                  var tr = document.createElement('tr');
+                  tr.innerHTML = `
+									<td>${income.mine}</td>
+									<td>${income.price}</td>
+									<td>${income.extras ? income.extras : '—'}</td>
+									<td>${new Date(income.date.toDate()).toLocaleDateString()}</td>
+									<td>${income.percentage}%</td>
+									<td><input type="checkbox" class="income-checkbox uk-checkbox" data-id="${
+                    doc.id
+                  }"></td>
+									<td><button class="uk-button uk-button-secondary edit-income-btn" data-id="${
+                    doc.id
+                  }"><span uk-icon="icon: file-edit" id="icon-delete-counter"></span></button></td>
+								`;
+                  if (income.calculated) {
+                    tr.classList.add('calculated');
+                  }
+                  newTableBody.appendChild(tr);
+                  if (new Date(income.date.toDate()).toDateString() === today) {
+                    todayIncome += income.mine;
+                  }
+                }
+              });
+              tableBody.parentNode.replaceChild(newTableBody, tableBody);
+              newTableBody.id = 'income-table-body';
+              document.getElementById('today-income').textContent =
+                'Заработок за сегодня: ' + todayIncome;
+
+              // Загрузка общего заработка за сегодня со всех девушек
+              db.collection('girls')
+                .get()
+                .then(function (snapshot) {
+                  var totalTodayIncome = 0;
+                  var promises = [];
+                  snapshot.forEach(function (doc) {
+                    var girlId = doc.id;
+                    var promise = db
+                      .collection('girls')
+                      .doc(girlId)
+                      .collection('incomes')
+                      .where('date', '>=', new Date(today))
+                      .where(
+                        'date',
+                        '<',
+                        new Date(
+                          new Date(today).getTime() + 24 * 60 * 60 * 1000
+                        )
+                      )
+                      .get()
+                      .then(function (snapshot) {
+                        var girlTodayIncome = 0;
+                        snapshot.forEach(function (doc) {
+                          var income = doc.data();
+                          if (!isNaN(income.mine)) {
+                            girlTodayIncome += income.mine;
+                          }
+                        });
+                        totalTodayIncome += girlTodayIncome;
+                      });
+                    promises.push(promise);
+                  });
+                  Promise.all(promises).then(function () {
+                    document.getElementById('today-income-all').textContent =
+                      'Со всех девушек за сегодня: ' + totalTodayIncome;
+                    updateButtonStates(); // Обновление состояния кнопок после загрузки данных
+                    resolve();
+                  });
+                });
+            })
+            .catch(function (error) {
+              console.error('Ошибка при загрузке доходов девушки:', error);
+              reject(error);
+            });
+        });
+      }
+
+      // Функция добавления дохода с учетом допов
+      function addIncome(girlId, price, extras) {
+        if (!isNaN(price)) {
+          db.collection('girls')
+            .doc(girlId)
+            .get()
+            .then(function (doc) {
+              var girl = doc.data();
+              var extrasPrice = extras.reduce(function (total, extra) {
+                return total + extra;
+              }, 0);
+              var totalPrice = price + extrasPrice;
+              var mine = Math.round((totalPrice * girl.percentage) / 100);
+              db.collection('girls')
+                .doc(girlId)
+                .collection('incomes')
+                .add({
+                  mine: mine,
+                  price: price,
+                  extras: extras.join(', '),
+                  percentage: girl.percentage,
+                  date: new Date(),
+                })
+                .then(function () {
+                  // UIkit.modal('#add-income-modal').hide();
+                  loadIncomes(girlId);
+                })
+                .catch(function (error) {
+                  console.error('Ошибка при добавлении дохода:', error);
+                });
+            })
+            .catch(function (error) {
+              console.error('Ошибка при получении данных девушки:', error);
+            });
+        } else {
+          console.warn('Некорректное значение цены');
+        }
+      }
+
+      // Обработчик нажатия на кнопку "Плюс"
+      document
+        .getElementById('add-income-btn')
+        .addEventListener('click', function () {
+          if (selectedGirlId) {
+            document.getElementById('add-income-submit-btn').dataset.girlId =
+              selectedGirlId;
+            // Сброс выделения кнопок выбора базовой цены и допов, исключая кнопку "OK"
+            document
+              .querySelectorAll(
+                '#add-income-modal .uk-modal-body .uk-button:not(#add-income-submit-btn)'
+              )
+              .forEach(function (btn) {
+                btn.classList.remove('uk-button-primary');
+              });
+            // Сброс выделения кнопки "+" для ввода произвольной суммы
+            document
+              .querySelector(
+                '#add-income-modal .uk-button-default[uk-toggle="target: #custom-price-modal"]'
+              )
+              .classList.remove('uk-button-primary');
+            // Выбор первого базового дохода по умолчанию
+            var firstBasePrice = document.querySelector(
+              '#add-income-modal .uk-modal-body .base-price-btn:first-of-type'
+            );
+            if (firstBasePrice) {
+              firstBasePrice.classList.add('uk-button-primary');
+            }
+          } else {
+            console.warn('Девушка не выбрана');
+          }
+        });
+
+      // Обработчик нажатия на кнопки выбора базовой цены
+      document
+        .querySelector('#add-income-modal .uk-modal-body .uk-margin')
+        .addEventListener('click', function (event) {
+          if (
+            event.target.tagName === 'BUTTON' &&
+            !event.target.classList.contains('uk-button-primary')
+          ) {
+            // Сброс выделения всех кнопок, кроме нажатой и кнопки "OK"
+            document
+              .querySelectorAll(
+                '#add-income-modal .uk-modal-body .uk-button:not(#add-income-submit-btn)'
+              )
+              .forEach(function (btn) {
+                btn.classList.remove('uk-button-primary');
+              });
+            event.target.classList.add('uk-button-primary');
+            // Сброс выделения кнопки "+" для ввода произвольной суммы
+            document
+              .querySelector(
+                '#add-income-modal .uk-button-default[uk-toggle="target: #custom-price-modal"]'
+              )
+              .classList.remove('uk-button-primary');
+          }
+        });
+
+      // Обработчик нажатия на кнопки выбора допов
+      document
+        .getElementById('extras-container')
+        .addEventListener('click', function (event) {
+          if (
+            event.target.tagName === 'BUTTON' &&
+            event.target.textContent !== '+'
+          ) {
+            event.target.classList.toggle('uk-button-primary');
+          }
+        });
+
+      var selectedBasePrice = null;
+
+      // Обработчик нажатия на кнопку "+" для ввода произвольной суммы
+      document
+        .querySelector(
+          '#add-income-modal .uk-button-default[uk-toggle="target: #custom-price-modal"]'
+        )
+        .addEventListener('click', function () {
+          selectedBasePrice = document.querySelector(
+            '#add-income-modal .uk-modal-body .base-price-btn.uk-button-primary'
+          );
+          document.getElementById('custom-price-input').value = '';
+        });
+
+      // Обработчик нажатия на кнопку "OK" в модальном окне ввода произвольной суммы
+      document
+        .querySelector('#custom-price-submit-btn')
+        .addEventListener('click', function () {
+          var customPrice = parseInt(
+            document.getElementById('custom-price-input').value
+          );
+          if (!isNaN(customPrice) && customPrice > 0) {
+            var basePriceContainer = document.querySelector(
+              '#add-income-modal .uk-modal-body .uk-margin'
+            );
+            var customPriceBtn = document.createElement('button');
+            customPriceBtn.className =
+              'uk-button uk-button-default uk-button-primary base-price-btn custom-price-button';
+            customPriceBtn.textContent = customPrice;
+            basePriceContainer.insertBefore(
+              customPriceBtn,
+              basePriceContainer.lastElementChild
+            );
+            UIkit.modal('#custom-price-modal').hide();
+            UIkit.modal('#add-income-modal').show();
+            // Сброс выделения кнопки "+" для ввода произвольной суммы
+            document
+              .querySelector(
+                '#add-income-modal .uk-button-default[uk-toggle="target: #custom-price-modal"]'
+              )
+              .classList.remove('uk-button-primary');
+            // Выделение добавленной произвольной суммы
+            selectedBasePrice = customPriceBtn;
+          } else {
+            console.warn('Некорректное значение произвольной суммы');
+          }
+        });
+
+      // Обработчик нажатия на кнопку "+" для добавления произвольного допа
+      document
+        .querySelector('#custom-extra-modal .uk-button-primary')
+        .addEventListener('click', function () {
+          var customExtra = parseInt(
+            document.getElementById('custom-extra-input').value.trim()
+          );
+          if (!isNaN(customExtra) && customExtra > 0) {
+            var extrasContainer = document.getElementById('extras-container');
+            var customExtraBtn = document.createElement('button');
+            customExtraBtn.className =
+              'uk-button uk-button-default uk-button-primary'; // Добавлено выделение нового допа
+            customExtraBtn.textContent = customExtra;
+            var addExtraButton = extrasContainer.querySelector(
+              '.uk-button-default[uk-toggle="target: #custom-extra-modal"]'
+            );
+            extrasContainer.insertBefore(customExtraBtn, addExtraButton);
+            UIkit.modal('#custom-extra-modal').hide();
+            UIkit.modal('#add-income-modal').show();
+            document.getElementById('custom-extra-input').value = '';
+          } else {
+            console.warn('Некорректное значение произвольного допа');
+          }
+        });
+
+      // Обработчик нажатия на кнопку "OK" в модальном окне добавления дохода
+      document
+        .getElementById('add-income-submit-btn')
+        .addEventListener('click', function () {
+          var girlId = this.dataset.girlId;
+          if (girlId) {
+            var selectedBasePrice = document.querySelector(
+              '#add-income-modal .uk-modal-body .base-price-btn.uk-button-primary'
+            );
+            if (selectedBasePrice) {
+              var price = parseInt(selectedBasePrice.textContent);
+              var selectedExtras = document.querySelectorAll(
+                '#extras-container .uk-button-primary'
+              );
+              var extras = Array.from(selectedExtras).map(function (button) {
+                return parseInt(button.textContent);
+              });
+              UIkit.modal('#add-income-modal').hide();
+              addIncome(girlId, price, extras);
+            } else {
+              alert(
+                'Пожалуйста, выберите основную сумму перед добавлением допов.'
+              );
+            }
+          } else {
+            console.warn('Девушка не выбрана');
+          }
+        });
+
+      // Обработчик закрытия модального окна "Произвольная сумма"
+      UIkit.util.on('#custom-price-modal', 'beforehide', function () {
+        if (!UIkit.util.isVisible('#custom-extra-modal')) {
+          UIkit.util.on('#custom-price-modal', 'hidden', function () {
+            UIkit.modal('#add-income-modal').show();
+            if (selectedBasePrice) {
+              selectedBasePrice.classList.add('uk-button-primary');
+            }
+          });
+        }
+      });
+
+      // Обработчик закрытия модального окна "Произвольный доп"
+      UIkit.util.on('#custom-extra-modal', 'beforehide', function () {
+        if (!UIkit.util.isVisible('#custom-price-modal')) {
+          UIkit.util.on('#custom-extra-modal', 'hidden', function () {
+            UIkit.modal('#add-income-modal').show();
+          });
+        }
+      });
+
+      // Обработчик нажатия на кнопку "Посчитать за месяц"
+      document
+        .getElementById('calculate-month-btn')
+        .addEventListener('click', function () {
+          if (selectedGirlId) {
+            loadMonthButtons(selectedGirlId);
+          } else {
+            console.warn('Девушка не выбрана');
+          }
+        });
+
+      function loadMonthButtons(girlId) {
+        db.collection('girls')
+          .doc(girlId)
+          .collection('incomes')
+          .get()
+          .then(function (snapshot) {
+            var monthSet = new Set();
+            snapshot.forEach(function (doc) {
+              var income = doc.data();
+              var date = income.date.toDate();
+              var month = date.getMonth() + 1;
+              var year = date.getFullYear();
+              var monthYear = `${month.toString().padStart(2, '0')}.${year}`;
+              monthSet.add(monthYear);
+            });
+            var monthButtons = Array.from(monthSet).sort().reverse();
+            displayMonthButtons(monthButtons);
+          })
+          .catch(function (error) {
+            console.error('Ошибка при загрузке кнопок месяцев:', error);
+          });
+      }
+
+      function displayMonthButtons(monthButtons) {
+        var monthButtonsContainer = document.getElementById(
+          'month-buttons-container'
+        );
+        monthButtonsContainer.innerHTML = '';
+        monthButtons.forEach(function (monthYear) {
+          var button = document.createElement('button');
+          button.className = 'uk-button uk-button-default';
+          button.textContent = monthYear;
+          button.addEventListener('click', function () {
+            calculateIncomeForMonth(selectedGirlId, monthYear);
+          });
+          monthButtonsContainer.appendChild(button);
+        });
+        UIkit.modal('#calculate-month-modal').show();
+      }
+
+      function calculateIncomeForMonth(girlId, monthYear) {
+        var [month, year] = monthYear.split('.');
+        var startDate = new Date(year, month - 1, 1);
+        var endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        var totalIncome = 0;
+        var totalIncomeAllGirls = 0;
+        var girlMonthIncome = 0;
+
+        // Получаем доходы девушки из основной коллекции и архива
+        var girlIncomeQuery = db
+          .collection('girls')
+          .doc(girlId)
+          .collection('incomes')
+          .where('date', '>=', startDate)
+          .where('date', '<=', endDate);
+
+        var archiveIncomeQuery = db
+          .collection('archive')
+          .doc(girlId)
+          .collection('incomes')
+          .where('date', '>=', startDate)
+          .where('date', '<=', endDate);
+
+        Promise.all([girlIncomeQuery.get(), archiveIncomeQuery.get()])
+          .then(function ([girlSnapshot, archiveSnapshot]) {
+            // Обрабатываем доходы из основной коллекции и архива
+            girlSnapshot.forEach(function (doc) {
+              var income = doc.data();
+              if (!isNaN(income.mine) && !isNaN(income.price)) {
+                totalIncome += income.mine;
+                var extraPrice = 0;
+                if (income.extras) {
+                  extraPrice = income.extras
+                    .split(',')
+                    .reduce(function (sum, extra) {
+                      return sum + parseInt(extra.trim());
+                    }, 0);
+                }
+                girlMonthIncome += income.price + extraPrice;
+              }
+            });
+
+            archiveSnapshot.forEach(function (doc) {
+              var income = doc.data();
+              if (!isNaN(income.mine) && !isNaN(income.price)) {
+                totalIncome += income.mine;
+                var extraPrice = 0;
+                if (income.extras) {
+                  extraPrice = income.extras
+                    .split(',')
+                    .reduce(function (sum, extra) {
+                      return sum + parseInt(extra.trim());
+                    }, 0);
+                }
+                girlMonthIncome += income.price + extraPrice;
+              }
+            });
+
+            girlMonthIncome -= totalIncome;
+
+            // Получаем общий доход со всех девушек из основной коллекции и архива
+            Promise.all([
+              db.collection('girls').get(),
+              db.collection('archive').get(),
+            ])
+              .then(function ([girlsSnapshot, archiveSnapshot]) {
+                var promises = [];
+
+                girlsSnapshot.forEach(function (doc) {
+                  var girlRef = db.collection('girls').doc(doc.id);
+                  var incomeQuery = girlRef
+                    .collection('incomes')
+                    .where('date', '>=', startDate)
+                    .where('date', '<=', endDate)
+                    .get();
+                  promises.push(incomeQuery);
+                });
+
+                archiveSnapshot.forEach(function (doc) {
+                  var girlRef = db.collection('archive').doc(doc.id);
+                  var incomeQuery = girlRef
+                    .collection('incomes')
+                    .where('date', '>=', startDate)
+                    .where('date', '<=', endDate)
+                    .get();
+                  promises.push(incomeQuery);
+                });
+
+                Promise.all(promises).then(function (results) {
+                  results.forEach(function (snapshot) {
+                    snapshot.forEach(function (doc) {
+                      var income = doc.data();
+                      if (!isNaN(income.mine)) {
+                        totalIncomeAllGirls += income.mine;
+                      }
+                    });
+                  });
+
+                  var message = `Заработок за ${monthYear}:\n\n\n`;
+                  message += `Текущая девушка: ${totalIncome}\n\n`;
+                  message += `Со всех девушек: ${totalIncomeAllGirls}\n\n`;
+                  message += `Заработок девушки за месяц: ${girlMonthIncome}`;
+                  alert(message);
+                });
+              })
+              .catch(function (error) {
+                console.error('Ошибка при расчете заработка за месяц:', error);
+              });
+          })
+          .catch(function (error) {
+            console.error('Ошибка при расчете заработка за месяц:', error);
+          });
+      }
+
+      // Обработчик нажатия на кнопку "За период"
+      document
+        .getElementById('calculate-all-btn')
+        .addEventListener('click', function () {
+          if (selectedGirlId) {
+            loadDateRangeModal(selectedGirlId);
+          } else {
+            console.warn('Девушка не выбрана');
+          }
+        });
+
+      function loadDateRangeModal(girlId) {
+        db.collection('girls')
+          .doc(girlId)
+          .collection('incomes')
+          .orderBy('date')
+          .get()
+          .then(function (snapshot) {
+            if (snapshot.size > 0) {
+              var startDate = snapshot.docs[0].data().date.toDate();
+              var endDate = snapshot.docs[snapshot.size - 1]
+                .data()
+                .date.toDate();
+              var startDateInput = document.querySelector(
+                '#arbitrary_dates_modal input[type="date"]:first-of-type'
+              );
+              var endDateInput = document.querySelector(
+                '#arbitrary_dates_modal input[type="date"]:last-of-type'
+              );
+              startDateInput.value = formatDate(startDate);
+              endDateInput.value = formatDate(endDate);
+              startDateInput.min = formatDate(startDate);
+              startDateInput.max = formatDate(endDate);
+              endDateInput.min = formatDate(startDate);
+              endDateInput.max = formatDate(endDate);
+              UIkit.modal('#arbitrary_dates_modal').show();
+            } else {
+              console.log('Нет доступных данных для расчета.');
+            }
+          })
+          .catch(function (error) {
+            console.error('Ошибка при загрузке диапазона дат:', error);
+          });
+      }
+
+      // Вспомогательная функция для форматирования даты в формат ГГГГ-ММ-ДД
+      function formatDate(date) {
+        var day = date.getDate().toString().padStart(2, '0');
+        var month = (date.getMonth() + 1).toString().padStart(2, '0');
+        var year = date.getFullYear();
+        return day + '.' + month + '.' + year;
+      }
+
+      // Обработчик нажатия на кнопку "Рассчитать" в модальном окне "Произвольные даты"
+      document
+        .querySelector('#arbitrary_dates_modal button[type="submit"]')
+        .addEventListener('click', function () {
+          var startDateInput = document.querySelector(
+            '#arbitrary_dates_modal input[type="date"]:first-of-type'
+          );
+          var endDateInput = document.querySelector(
+            '#arbitrary_dates_modal input[type="date"]:last-of-type'
+          );
+          var startDate = new Date(startDateInput.value);
+          var endDate = new Date(endDateInput.value);
+          calculateIncomeForDateRange(selectedGirlId, startDate, endDate);
+        });
+
+      function calculateIncomeForDateRange(girlId, startDate, endDate) {
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+
+        // Получаем доходы девушки из основной коллекции и архива
+        var girlIncomeQuery = db
+          .collection('girls')
+          .doc(girlId)
+          .collection('incomes')
+          .where('date', '>=', startDate)
+          .where('date', '<=', endDate);
+
+        var archiveIncomeQuery = db
+          .collection('archive')
+          .doc(girlId)
+          .collection('incomes')
+          .where('date', '>=', startDate)
+          .where('date', '<=', endDate);
+
+        Promise.all([girlIncomeQuery.get(), archiveIncomeQuery.get()])
+          .then(function ([girlSnapshot, archiveSnapshot]) {
+            var totalIncome = 0;
+            var girlPeriodIncome = 0;
+
+            // Обрабатываем доходы из основной коллекции и архива
+            girlSnapshot.forEach(function (doc) {
+              var income = doc.data();
+              if (!isNaN(income.mine)) {
+                totalIncome += income.mine;
+              }
+              if (!isNaN(income.price)) {
+                var extraPrice = 0;
+                if (income.extras) {
+                  extraPrice = income.extras
+                    .split(',')
+                    .reduce(function (sum, extra) {
+                      return sum + parseInt(extra.trim());
+                    }, 0);
+                }
+                girlPeriodIncome += income.price + extraPrice;
+              }
+            });
+
+            archiveSnapshot.forEach(function (doc) {
+              var income = doc.data();
+              if (!isNaN(income.mine)) {
+                totalIncome += income.mine;
+              }
+              if (!isNaN(income.price)) {
+                var extraPrice = 0;
+                if (income.extras) {
+                  extraPrice = income.extras
+                    .split(',')
+                    .reduce(function (sum, extra) {
+                      return sum + parseInt(extra.trim());
+                    }, 0);
+                }
+                girlPeriodIncome += income.price + extraPrice;
+              }
+            });
+
+            girlPeriodIncome -= totalIncome;
+
+            // Получаем общий доход со всех девушек из основной коллекции и архива
+            Promise.all([
+              db.collection('girls').get(),
+              db.collection('archive').get(),
+            ])
+              .then(function ([girlsSnapshot, archiveSnapshot]) {
+                var promises = [];
+
+                girlsSnapshot.forEach(function (doc) {
+                  var girlRef = db.collection('girls').doc(doc.id);
+                  var incomeQuery = girlRef
+                    .collection('incomes')
+                    .where('date', '>=', startDate)
+                    .where('date', '<=', endDate)
+                    .get();
+                  promises.push(incomeQuery);
+                });
+
+                archiveSnapshot.forEach(function (doc) {
+                  var girlRef = db.collection('archive').doc(doc.id);
+                  var incomeQuery = girlRef
+                    .collection('incomes')
+                    .where('date', '>=', startDate)
+                    .where('date', '<=', endDate)
+                    .get();
+                  promises.push(incomeQuery);
+                });
+
+                Promise.all(promises).then(function (results) {
+                  var totalIncomeAllGirls = 0;
+
+                  results.forEach(function (snapshot) {
+                    snapshot.forEach(function (doc) {
+                      var income = doc.data();
+                      if (!isNaN(income.mine)) {
+                        totalIncomeAllGirls += income.mine;
+                      }
+                    });
+                  });
+
+                  var message = `Заработок за период с ${formatDate(
+                    startDate
+                  )} по ${formatDate(endDate)}:\n\n\n`;
+                  message += `Текущая девушка: ${totalIncome}\n\n`;
+                  message += `Со всех девушек: ${totalIncomeAllGirls}\n\n`;
+                  message += `Заработок девушки за период: ${girlPeriodIncome}`;
+                  alert(message);
+                  UIkit.modal('#arbitrary_dates_modal').hide();
+                });
+              })
+              .catch(function (error) {
+                console.error('Ошибка при расчете заработка за период:', error);
+              });
+          })
+          .catch(function (error) {
+            console.error('Ошибка при расчете заработка за период:', error);
+          });
+      }
+
+      function addTimeToCounter(girlId, minutes) {
+        db.collection('girls')
+          .doc(girlId)
+          .get()
+          .then(function (doc) {
+            var girl = doc.data();
+            var endDate;
+            if (girl.ashooCounter) {
+              if (girl.ashooPaused) {
+                var pausedTime = girl.ashooPausedTime;
+                var currentTime = new Date().getTime();
+                var remainingTime = pausedTime + minutes * 60000;
+                endDate = new Date(currentTime + remainingTime);
+              } else {
+                endDate = new Date(girl.ashooCounter);
+                endDate.setMinutes(endDate.getMinutes() + minutes);
+              }
+            } else {
+              endDate = new Date();
+              endDate.setMinutes(endDate.getMinutes() + minutes);
+            }
+            return db.collection('girls').doc(girlId).update({
+              ashooCounter: endDate.toISOString(),
+              ashooPaused: false,
+              ashooPausedTime: firebase.firestore.FieldValue.delete(),
+            });
+          })
+          .then(function () {
+            console.log('Время успешно добавлено к счетчику рекламы на Ashoo');
+            UIkit.modal('#add-ashoo-counter').hide();
+            loadGirlDetails(girlId);
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при добавлении времени к счетчику рекламы на Ashoo:',
+              error
+            );
+          });
+      }
+
+      // Обработчик отправки формы добавления счетчика рекламы на Ashoo
+      document
+        .getElementById('ahsoo-counter-form')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          var replenishmentAmount = parseFloat(this.elements[0].value);
+          var pricePerMinute = parseFloat(this.elements[1].value);
+          var numberOfProfiles = parseInt(this.elements[2].value);
+          var customDateTime = this.elements[3].value;
+
+          if (selectedGirlId) {
+            if (customDateTime) {
+              // Если выбрана произвольная дата, игнорируем остальные поля и устанавливаем таймер на основе этой даты
+              var endDate = new Date(customDateTime);
+              db.collection('girls')
+                .doc(selectedGirlId)
+                .update({
+                  ashooCounter: endDate.toISOString(),
+                  ashooPaused: false,
+                  ashooPausedTime: firebase.firestore.FieldValue.delete(),
+                  ashooPausedEndDate: firebase.firestore.FieldValue.delete(),
+                })
+                .then(function () {
+                  console.log('Счетчик рекламы на Ashoo успешно обновлен');
+                  UIkit.modal('#add-ashoo-counter').hide();
+                  loadGirlDetails(selectedGirlId);
+                })
+                .catch(function (error) {
+                  console.error(
+                    'Ошибка при обновлении счетчика рекламы на Ashoo:',
+                    error
+                  );
+                });
+            } else {
+              // Если произвольная дата не выбрана, выполняем стандартную логику добавления времени к счетчику
+              var minutes = replenishmentAmount / pricePerMinute;
+              var totalMinutes = Math.round(minutes / numberOfProfiles);
+              addTimeToCounter(selectedGirlId, totalMinutes);
+            }
+          } else {
+            console.warn('Девушка не выбрана');
+          }
+        });
+
+      // Функция для отображения счетчика рекламы на Ashoo
+      function displayAshooCounter(girl) {
+        var ashooCounterBox = document.getElementById('ashoo-counter-box');
+
+        if (girl.ashooCounter) {
+          var endDate = new Date(girl.ashooCounter);
+
+          if (girl.ashooPaused) {
+            renderPausedCounter(ashooCounterBox, girl.ashooPausedDays);
+          } else {
+            renderActiveCounter(ashooCounterBox, endDate);
+          }
+
+          // Назначаем обработчики событий после обновления HTML-кода счетчика
+          assignCounterEventListeners();
+        } else {
+          ashooCounterBox.innerHTML = '<span>Таймер отсутствует</span>';
+        }
+      }
+
+      function renderPausedCounter(counterElement, remainingDays) {
+        var dayWord = getDayWord(remainingDays);
+
+        counterElement.innerHTML = `
+					<span>Осталось: ~ ${remainingDays} ${dayWord}</span>
+					<span class="uk-margin-small-left uk-margin-xsmall-right" uk-icon="icon: lock" id="icon-pause-counter"></span>
+					<span uk-icon="icon: trash" id="icon-delete-counter"></span>
+				`;
+      }
+
+      function renderActiveCounter(counterElement, endDate) {
+        counterElement.innerHTML = `
+					<div><div class="uk-countdown-number uk-countdown-days uk-text-default uk-margin-xsmall-right"></div></div>
+					<div class="uk-countdown-separator uk-text-default uk-margin-xsmall-right">:</div>
+					<div><div class="uk-countdown-number uk-countdown-hours uk-text-default uk-margin-xsmall-right"></div></div>
+					<div class="uk-countdown-separator uk-text-default uk-margin-xsmall-right">:</div>
+					<div><div class="uk-countdown-number uk-countdown-minutes uk-text-default uk-margin-xsmall-right"></div></div>
+					<div class="uk-countdown-separator uk-text-default uk-margin-xsmall-right">:</div>
+					<div><div class="uk-countdown-number uk-countdown-seconds uk-text-default uk-margin-xsmall-right"></div></div>
+					<span class="uk-margin-small-left uk-margin-xsmall-right" uk-icon="icon: unlock" id="icon-pause-counter"></span>
+					<span uk-icon="icon: trash" id="icon-delete-counter"></span>
+				`;
+        counterElement.setAttribute(
+          'uk-countdown',
+          'date: ' + endDate.toISOString()
+        );
+      }
+
+      function pauseCounter(countdownElement, endDate) {
+        var currentDate = new Date();
+        var remainingTime = endDate.getTime() - currentDate.getTime();
+        var remainingDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+        var remainingHours = Math.floor(
+          (remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+
+        if (remainingHours >= 12) {
+          remainingDays++;
+        }
+
+        db.collection('girls')
+          .doc(selectedGirlId)
+          .update({
+            ashooPausedTime: remainingTime,
+            ashooPaused: true,
+            ashooPausedDays: remainingDays,
+          })
+          .then(function () {
+            console.log('Счетчик рекламы на Ashoo успешно поставлен на паузу');
+            renderPausedCounter(countdownElement, remainingDays);
+            assignCounterEventListeners();
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при постановке счетчика рекламы на Ashoo на паузу:',
+              error
+            );
+          });
+      }
+
+      function resumeCounter(countdownElement) {
+        db.collection('girls')
+          .doc(selectedGirlId)
+          .get()
+          .then(function (doc) {
+            var girl = doc.data();
+            var pausedTime = girl.ashooPausedTime;
+            var currentTime = new Date().getTime();
+            var newEndDate = new Date(currentTime + pausedTime);
+
+            db.collection('girls')
+              .doc(selectedGirlId)
+              .update({
+                ashooCounter: newEndDate.toISOString(),
+                ashooPaused: false,
+                ashooPausedTime: firebase.firestore.FieldValue.delete(),
+                ashooPausedEndDate: firebase.firestore.FieldValue.delete(),
+              })
+              .then(function () {
+                console.log('Счетчик рекламы на Ashoo успешно снят с паузы');
+                renderActiveCounter(countdownElement, newEndDate);
+                assignCounterEventListeners();
+              })
+              .catch(function (error) {
+                console.error(
+                  'Ошибка при снятии счетчика рекламы на Ashoo с паузы:',
+                  error
+                );
+              });
+          })
+          .catch(function (error) {
+            console.error('Ошибка при получении данных девушки:', error);
+          });
+      }
+
+      // Функция для склонения слова "день"
+      function getDayWord(days) {
+        if (days % 10 === 1 && days % 100 !== 11) {
+          return 'день';
+        } else if (
+          [2, 3, 4].includes(days % 10) &&
+          ![12, 13, 14].includes(days % 100)
+        ) {
+          return 'дня';
+        } else {
+          return 'дней';
+        }
+      }
+
+      function assignCounterEventListeners() {
+        // Обработчик клика на иконку паузы/возобновления
+        document
+          .getElementById('icon-pause-counter')
+          .addEventListener('click', function () {
+            if (selectedGirlId) {
+              var icon = this;
+              var countdownElement =
+                document.getElementById('ashoo-counter-box');
+              var countdownDate = countdownElement.getAttribute('uk-countdown');
+              var endDate = new Date(countdownDate.replace('date: ', ''));
+
+              if (icon.getAttribute('uk-icon') === 'icon: unlock') {
+                pauseCounter(countdownElement, endDate);
+              } else {
+                resumeCounter(countdownElement);
+              }
+            } else {
+              console.warn('Девушка не выбрана');
+            }
+          });
+
+        // Обработчик клика на иконку удаления счетчика
+        document
+          .getElementById('icon-delete-counter')
+          .addEventListener('click', function () {
+            if (
+              confirm(
+                'Вы уверены, что хотите удалить счетчик рекламы на Ashoo?'
+              )
+            ) {
+              if (selectedGirlId) {
+                db.collection('girls')
+                  .doc(selectedGirlId)
+                  .update({
+                    ashooCounter: firebase.firestore.FieldValue.delete(),
+                    ashooPaused: firebase.firestore.FieldValue.delete(),
+                    ashooPausedTime: firebase.firestore.FieldValue.delete(),
+                    ashooPausedEndDate: firebase.firestore.FieldValue.delete(),
+                    smsSent: firebase.firestore.FieldValue.delete(),
+                  })
+                  .then(function () {
+                    console.log('Счетчик рекламы на Ashoo успешно удален');
+                    loadGirlDetails(selectedGirlId);
+                  })
+                  .catch(function (error) {
+                    console.error(
+                      'Ошибка при удалении счетчика рекламы на Ashoo:',
+                      error
+                    );
+                  });
+              } else {
+                console.warn('Девушка не выбрана');
+              }
+            }
+          });
+      }
+
+      // Обработчик события 'change' для чекбоксов
+      document.addEventListener('change', function (event) {
+        if (event.target.classList.contains('income-checkbox')) {
+          updateButtonStates();
+        }
+      });
+
+      function updateButtonStates() {
+        var checkboxes = document.querySelectorAll('.income-checkbox:checked');
+        var calculatedBtn = document.getElementById('calculated-btn');
+        var multiTrashBtn = document.getElementById('multi-trash-btn');
+        if (checkboxes.length > 0) {
+          calculatedBtn.style.display = 'inline-block';
+          multiTrashBtn.style.display = 'inline-block';
+        } else {
+          calculatedBtn.style.display = 'none';
+          multiTrashBtn.style.display = 'none';
+        }
+      }
+
+      document
+        .getElementById('calculated-btn')
+        .addEventListener('click', function () {
+          var checkboxes = document.querySelectorAll(
+            '.income-checkbox:checked'
+          );
+          var incomeIds = Array.from(checkboxes).map(function (checkbox) {
+            return checkbox.dataset.id;
+          });
+          markIncomesAsCalculated(selectedGirlId, incomeIds);
+        });
+
+      document
+        .getElementById('multi-trash-btn')
+        .addEventListener('click', function () {
+          var checkboxes = document.querySelectorAll(
+            '.income-checkbox:checked'
+          );
+          var incomeIds = Array.from(checkboxes).map(function (checkbox) {
+            return checkbox.dataset.id;
+          });
+          if (confirm('Вы уверены, что хотите удалить выбранные доходы?')) {
+            deleteSelectedIncomes(selectedGirlId, incomeIds);
+          }
+        });
+
+      function deleteSelectedIncomes(girlId, incomeIds) {
+        // Скрытие кнопок "Рассчитано" и "Удалить" перед удалением данных
+        var calculatedBtn = document.getElementById('calculated-btn');
+        var multiTrashBtn = document.getElementById('multi-trash-btn');
+        calculatedBtn.style.display = 'none';
+        multiTrashBtn.style.display = 'none';
+
+        var batch = db.batch();
+        incomeIds.forEach(function (incomeId) {
+          var incomeRef = db
+            .collection('girls')
+            .doc(girlId)
+            .collection('incomes')
+            .doc(incomeId); // Здесь была опечатка
+          batch.delete(incomeRef);
+        });
+        batch
+          .commit()
+          .then(function () {
+            console.log('Выбранные доходы успешно удалены');
+            loadIncomes(girlId)
+              .then(function () {
+                // Сброс состояния чекбоксов
+                var checkboxes = document.querySelectorAll('.income-checkbox');
+                checkboxes.forEach(function (checkbox) {
+                  checkbox.checked = false;
+                });
+              })
+              .catch(function (error) {
+                console.error('Ошибка при загрузке доходов:', error);
+              });
+          })
+          .catch(function (error) {
+            console.error('Ошибка при удалении выбранных доходов:', error);
+          });
+      }
+
+      function markIncomesAsCalculated(girlId, incomeIds) {
+        // Скрытие кнопок "Рассчитано" и "Удалить" перед обновлением данных
+        var calculatedBtn = document.getElementById('calculated-btn');
+        var multiTrashBtn = document.getElementById('multi-trash-btn');
+        calculatedBtn.style.display = 'none';
+        multiTrashBtn.style.display = 'none';
+
+        var batch = db.batch();
+        incomeIds.forEach(function (incomeId) {
+          var incomeRef = db
+            .collection('girls')
+            .doc(girlId)
+            .collection('incomes')
+            .doc(incomeId);
+          batch.update(incomeRef, {
+            calculated: true,
+          });
+        });
+        batch
+          .commit()
+          .then(function () {
+            console.log('Доходы успешно отмечены как рассчитанные');
+            loadIncomes(girlId)
+              .then(function () {
+                // Сброс состояния чекбоксов
+                var checkboxes = document.querySelectorAll('.income-checkbox');
+                checkboxes.forEach(function (checkbox) {
+                  checkbox.checked = false;
+                });
+              })
+              .catch(function (error) {
+                console.error('Ошибка при загрузке доходов:', error);
+              });
+          })
+          .catch(function (error) {
+            console.error(
+              'Ошибка при отметке доходов как рассчитанных:',
+              error
+            );
+          });
+      }
+
+      function toggleTableButtonText(button) {
+        button.textContent =
+          button.textContent === 'Таблица' ? 'Скрыть' : 'Таблица';
+      }
+
+      const collectionsConfig = {
+        girls: ['incomes'], // Подколлекции для girls
+      };
+
+      document
+        .getElementById('download')
+        .addEventListener('click', async function () {
+          const allData = {};
+
+          async function fetchData(collectionPath) {
+            const snapshot = await db.collection(collectionPath).get();
+            const data = {};
+            snapshot.forEach((doc) => {
+              data[doc.id] = doc.data();
+            });
+            return data;
+          }
+
+          async function fetchCollectionData(collectionKey, subcollections) {
+            const mainData = await fetchData(collectionKey);
+            const collectionData = {};
+
+            for (const docId in mainData) {
+              const newName = mainData[docId].name || 'Unnamed'; // Используем имя, если оно есть
+              collectionData[newName] = mainData[docId];
+
+              let counter = 1; // Счётчик для нумерации подколлекций
+              for (const subcollection of subcollections) {
+                const subcollectionPath = `${collectionKey}/${docId}/${subcollection}`;
+                const subData = await fetchData(subcollectionPath);
+                const subcollectionFormatted = {};
+
+                for (const subDocId in subData) {
+                  subcollectionFormatted[`Income ${counter++}`] =
+                    subData[subDocId];
+                }
+
+                collectionData[newName][subcollection] = subcollectionFormatted;
+              }
+            }
+
+            return { [collectionKey]: collectionData };
+          }
+
+          try {
+            for (const [collectionKey, subcollections] of Object.entries(
+              collectionsConfig
+            )) {
+              const data = await fetchCollectionData(
+                collectionKey,
+                subcollections
+              );
+              Object.assign(allData, data);
+            }
+
+            // Получаем текущую дату и форматируем её
+            const date = new Date();
+            const formattedDate = date
+              .toLocaleDateString('en-GB')
+              .replace(/\//g, '-');
+
+            // Сохраняем данные в файл JSON с датой в названии
+            const filename = `firestore-data-${formattedDate}.json`;
+            const blob = new Blob([JSON.stringify(allData, null, 2)], {
+              type: 'application/json',
+            });
+            saveAs(blob, filename);
+          } catch (error) {
+            console.error('Ошибка при загрузке данных: ', error);
+          }
+        });
+
+      // Инициализация приложения
+      loadGirls();
+    </script>
+  </body>
+</html>
